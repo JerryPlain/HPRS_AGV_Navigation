@@ -1,0 +1,14 @@
+{
+  "approach_dist": {
+    "old": 1.6,
+    "new": 2.24
+  },
+  "delta_dist_weight": {
+    "old": 1.2,
+    "new": 1.68
+  },
+  "laser_safe": {
+    "old": 1.5,
+    "new": 0.9
+  }
+}

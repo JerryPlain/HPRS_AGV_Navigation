@@ -1,0 +1,15 @@
+# Training Hyperparameters
+max_timesteps: 100000      # Total environment steps (across all envs)
+batch_size: 1024           # Minibatch size for training
+eval_freq: 2500            # Evaluate every X steps
+start_steps: 50000         # Warmup steps
+hprs_config: "auto-shaping/configs/warehouse.yaml"
+
+# Paths
+dataset_path: "./agent/logs/expert_dataset.pkl"
+pretrained_path: "./agent/logs/models/td3_bc_offline_30000"
+models_dir: "./agent/logs/models/online"
+log_dir: "./agent/logs/runs"
+
+# Evaluation
+eval_episodes: 10          # Number of episodes for evaluation

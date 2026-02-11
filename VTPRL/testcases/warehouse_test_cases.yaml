@@ -1,0 +1,29 @@
+meta:
+  name: "warehouse_debug"
+  repeats: 1
+
+cases:
+  # ---- Baseline ----
+  - id: "C00_open_short"
+    robot_pose: [0.0, 0.0, 0.0]
+    target_pose: [4.0, 2.0, 0.0]
+
+  # ---- Large heading change ----
+  - id: "C01_open_turn"
+    robot_pose: [0.0, 0.0, 0.0]
+    target_pose: [0.0, 3.0, 0.0]
+
+  # ---- Backward start ----
+  - id: "C02_backward_start"
+    robot_pose: [0.0, 0.0, 3.14]
+    target_pose: [4.0, 0.0, 0.0]
+
+  # ---- Long distance ----
+  - id: "C10_long_run"
+    robot_pose: [-3.0, 0.0, 0.0]
+    target_pose: [5.0, 0.0, 0.0]
+
+  # ---- Goal near corner ----
+  - id: "C20_corner_goal"
+    robot_pose: [-2.0, -2.0, 0.0]
+    target_pose: [5.0, 3.0, 0.0]

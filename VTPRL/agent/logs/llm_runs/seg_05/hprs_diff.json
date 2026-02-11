@@ -1,0 +1,6 @@
+{
+  "collision_penalty": {
+    "old": 1.0,
+    "new": 0.9
+  }
+}

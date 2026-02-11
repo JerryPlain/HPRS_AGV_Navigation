@@ -1,0 +1,59 @@
+specs:
+  # Hierarchical Priority Reward Shaping for Warehouse Navigation Task
+  # Priorities (from high to low): Safety > Target > Comfort
+
+  # SAFETY
+  # safety constraints (never violated)
+  - 'ensure "collision" <= 0.0'
+
+  # TARGET (gated by safety)
+  - 'achieve "pose_error" <= "approach_dist"'
+  - 'achieve "min_laser" >= "laser_safe"'
+  - 'achieve abs "delta_yaw" <= "yaw_comfort"'
+
+  # COMFORT (gated by safety and target)
+  - 'encourage abs "robot_v" <= "v_comfort"'
+  - 'encourage abs "robot_omega" <= "omega_comfort"'
+  - 'encourage "dist_to_goal" <= "pos_comfort"'
+  - 'encourage "dist_to_goal" <= "near_goal"'
+  - 'encourage "dist_to_goal" <= "very_near_goal"'
+
+constants:
+  # approach distance for dense shaping, success is handled by ['success'] flag, not here
+  - { name: approach_dist,  value: 2.0 }
+
+  # Comfort Zones (start looser, tighten over time)
+  - { name: v_comfort,       value: 0.6 }
+  - { name: omega_comfort,   value: 0.4 }
+
+  - { name: pos_comfort,     value: 2.0 } # comfort reward inside ~2m of goal
+  - { name: near_goal,       value: 0.3 } # stronger shaping when within 0.3m of goal
+  - { name: very_near_goal,  value: 0.2 } # extra shaping when within 0.2m of goal
+  - { name: yaw_comfort,     value: 0.35 } # ~20 degrees, tighten later to ~10 degrees
+  - { name: laser_safe,      value: 1.5 } # encourage >=1m clearance to obstacles
+  - { name: collision_penalty, value: 1.0 } # stronger penalty applied when collision occurs
+  - { name: delta_dist_weight, value: 1.0 } # extra reward for getting closer to goal each step
+
+variables:
+  # Base State Variables
+  - { name: robot_x,     fn: "state['robot_x']",     min: -7.5, max: 7.5 }
+  - { name: robot_y,     fn: "state['robot_y']",     min: -7.5, max: 7.5 }
+  - { name: robot_yaw,   fn: "state['robot_yaw']",   min: -3.14, max: 3.14 }
+
+  # Robot Velocities
+  - { name: robot_v,     fn: "state['robot_v']",     min: -0.8,  max: 0.8 }
+  - { name: robot_omega, fn: "state['robot_omega']", min: -0.5,  max: 0.5 }
+
+  # Goal Deltas
+  - { name: delta_x,   fn: "state['delta_x']",   min: -10.0, max: 10.0 }
+  - { name: delta_y,   fn: "state['delta_y']",   min: -10.0, max: 10.0 }
+  - { name: delta_yaw, fn: "state['delta_yaw']", min: -3.14, max: 3.14 }
+  - { name: dist_to_goal, fn: "state['dist_to_goal']", min: 0.0, max: 15.0 }
+  - { name: pose_error, fn: "state['dist_to_goal'] + 0.5*abs(state['delta_yaw'])", min: 0.0, max: 20.0 }
+
+  # Flags from environment
+  - { name: collision, fn: "state['collision']", min: 0.0, max: 1.0 }
+  - { name: min_laser, fn: "state['min_laser']", min: 0.0, max: 5.0 }
+
+  # Crucial: Success flag provided directly by extend_state
+  - { name: success, fn: "state['success']", min: 0.0, max: 1.0 }

@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "auto-shaping"
+version = "0.1.0"
+description = "Auto shaping package"
+readme = "README.md"
+requires-python = ">=3.8"
+
+dependencies = [
+    # keep empty for now OR list deps here
+]
+
+[tool.setuptools.packages.find]
+where = ["."]

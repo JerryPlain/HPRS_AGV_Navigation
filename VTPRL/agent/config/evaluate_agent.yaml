@@ -1,0 +1,17 @@
+# Evaluation Configuration
+
+# Paths
+dataset_path: "./agent/logs/expert_dataset.pkl"
+model_path: "./agent/logs/models/td3_bc_offline_step_20000"
+
+# HPRS Configuration
+hprs_config: "auto-shaping/configs/warehouse.yaml"
+
+# Evaluation Settings
+num_episodes: 200          # Number of episodes to evaluate
+max_steps: 2000            # Max steps per episode
+
+# Randomization
+randomize_seed: true     # If true, reseed env each episode
+base_seed: 1000          # Base seed for evaluation (episode i uses base_seed + i)
+seed_stride: 100         # Step between episode seeds (seed = base_seed + i * seed_stride)

@@ -1,0 +1,11 @@
+max_timesteps: 10000
+batch_size: 1024
+eval_freq: 2500
+start_steps: 50000
+save_every: 10000
+hprs_config: agent/logs/llm_runs/seg_04/warehouse_llm_seg_04.yaml
+dataset_path: ./agent/logs/expert_dataset.pkl
+pretrained_path: agent/logs/models/online_llm/seg_04/TD3_warm_start_Online_EGO_last
+models_dir: agent/logs/models/online_llm/seg_05
+log_dir: agent/logs/llm_runs/seg_05/runs
+eval_episodes: 200

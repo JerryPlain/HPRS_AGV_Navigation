@@ -1,0 +1,10 @@
+{
+  "segments": 10,
+  "last_hprs": "agent/logs/llm_runs/seg_09/warehouse_llm_seg_09.yaml",
+  "last_checkpoint": "agent/logs/models/online_llm/seg_10/TD3_warm_start_Online_EGO_last",
+  "val_episodes": 10,
+  "accept_delta": 0.0,
+  "accept_reward_delta": 0.1,
+  "accept_collision_delta": 0.0,
+  "runs_dir": "agent/logs/llm_runs"
+}

@@ -1,0 +1,17 @@
+{
+  "old_hprs": "agent/logs/llm_runs/seg_04/warehouse_llm_seg_04.yaml",
+  "new_hprs": "agent/logs/llm_runs/seg_05/warehouse_llm_seg_05.yaml",
+  "old_metrics": {
+    "success_rate": 0.5,
+    "collision_rate": 0.0,
+    "mean_reward": 1.413249179960134,
+    "mean_success_reward": 2.116235596419866
+  },
+  "new_metrics": {
+    "success_rate": 0.4,
+    "collision_rate": 0.0,
+    "mean_reward": 0.9735685618254862,
+    "mean_success_reward": 1.6946620390822802
+  },
+  "reject_reason": "success_rate dropped by -0.100"
+}

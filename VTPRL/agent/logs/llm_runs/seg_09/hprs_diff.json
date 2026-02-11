@@ -1,0 +1,10 @@
+{
+  "approach_dist": {
+    "old": 1.6,
+    "new": 0.96
+  },
+  "collision_penalty": {
+    "old": 1.0,
+    "new": 1.4
+  }
+}

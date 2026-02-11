@@ -1,0 +1,12 @@
+{
+  "episodes": 4,
+  "success_rate": 1.0,
+  "collision_rate": 0.0,
+  "timeout_rate": 0.0,
+  "mean_reward": 0.13824525475502014,
+  "mean_length": 598.75,
+  "reward_std": 1.2522399425506592,
+  "length_std": 167.0634307861328,
+  "mean_success_reward": 0.13824525475502014,
+  "monitor_csv": "agent/logs/llm_runs/seg_06/runs/monitor.csv"
+}

@@ -1,0 +1,12 @@
+#{"t_start": 1769906820.881185, "env_id": "None"}
+r,l,t,success,collision,timeout
+4.4016876,1999,108.132042,False,False,False
+-0.5115945,566,138.475575,True,False,False
+8.052582,1091,179.069938,True,False,False
+2.2407916,449,199.896894,True,False,False
+0.763375,1999,298.275337,False,False,False
+8.146572,654,337.168477,True,False,False
+-0.99928176,597,359.321036,True,False,False
+1.4244431,356,373.228279,True,False,False
+-0.18398626,1999,471.607986,False,False,False
+0.39246553,536,496.56354,True,False,False

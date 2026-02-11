@@ -1,0 +1,108 @@
+ARG cuda_docker_tag="12.8.1-cudnn-devel-ubuntu22.04"
+FROM nvidia/cuda:"${cuda_docker_tag}"
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+###############################################################################
+# Fix Nvidia keys
+###############################################################################
+
+RUN apt-key del 7fa2af80 || true && \
+    rm -f /etc/apt/sources.list.d/cuda.list && \
+    rm -f /etc/apt/sources.list.d/nvidia-ml.list
+
+ADD https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.0-1_all.deb .
+RUN dpkg -i cuda-keyring_1.0-1_all.deb && rm cuda-keyring_1.0-1_all.deb
+
+###############################################################################
+# Essential packages
+###############################################################################
+
+RUN apt-get update --fix-missing && \
+    apt-get install -y \
+        wget bzip2 ca-certificates unzip curl git git-all nano vim tmux gcc g++ tree \
+        build-essential cmake pkg-config software-properties-common apt-transport-https \
+        htop graphviz ffmpeg \
+        libsm6 libxext6 libxi-dev libxmu-dev freeglut3-dev \
+        libbullet-dev libode-dev liboctomap-dev libassimp-dev libccd-dev libfcl-dev \
+        libboost-all-dev libtinyxml2-dev liburdfdom-dev libopenmpi-dev \
+        libosmesa6-dev libcairo2-dev patchelf \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+###############################################################################
+# Python 3.10 + venv
+###############################################################################
+
+RUN apt-get update && \
+    apt-get install -y \
+        python3.10 python3.10-dev python3.10-venv python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN rm -f /usr/bin/python3 && \
+    ln -s /usr/bin/python3.10 /usr/bin/python3 && \
+    ln -s /usr/bin/python3 /usr/bin/python
+
+RUN python -m pip install --upgrade pip setuptools wheel pytest pytest-cov flake8
+
+###############################################################################
+# Shell
+###############################################################################
+
+SHELL ["/bin/bash", "-c"]
+ENV SHELL=/bin/bash
+RUN ln -sf /bin/bash /bin/sh
+
+###############################################################################
+# OpenGL + Qt runtime (CRITICAL)
+###############################################################################
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        mesa-utils libglu1-mesa-dev mesa-common-dev \
+        libglew-dev libglfw3-dev libglm-dev \
+        libao-dev libmpg123-dev \
+        libglvnd-dev libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev \
+        \
+        # Qt + xcb runtime deps
+        libqt5core5a libqt5gui5 libqt5widgets5 qtbase5-dev qtwayland5 \
+        libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 \
+        libxcb-xkb-dev libxkbcommon-x11-0 libxcb-xinerama0 \
+    && rm -rf /var/lib/apt/lists/*
+
+###############################################################################
+# Python virtual environment
+###############################################################################
+
+RUN python3.10 -m venv /home/venv-warehouse
+
+ENV VIRTUAL_ENV=/home/venv-warehouse
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+###############################################################################
+# Qt environment (VERY IMPORTANT)
+###############################################################################
+
+ENV QT_QPA_PLATFORM=xcb
+ENV QT_X11_NO_MITSHM=1
+ENV QT_DEBUG_PLUGINS=0
+
+###############################################################################
+# Python dependencies (venv)
+###############################################################################
+
+ADD Docker/requirements_Python310.txt /home/requirements.txt
+
+RUN python -m pip install -r /home/requirements.txt \
+    --log /home/requirements_logs.txt
+
+# Remove OpenCV Qt plugins to prevent Qt ABI conflicts
+RUN rm -rf /home/venv-warehouse/lib/python3.10/site-packages/cv2/qt
+
+###############################################################################
+# Startup
+###############################################################################
+
+ADD Docker/startup.sh /home/startup.sh
+RUN chmod +x /home/startup.sh
+
+WORKDIR /home

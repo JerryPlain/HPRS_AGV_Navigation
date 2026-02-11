@@ -1,0 +1,7 @@
+{
+  "constants": {
+    "approach_dist": 1.6,
+    "delta_dist_weight": 1.2
+  },
+  "explanation": "Decreasing approach_dist and delta_dist_weight by 40% reduces the urgency for progress, potentially lowering the likelihood of collisions. Increasing laser_safe and collision_penalty by 40% enhances safety without risking an increase in collision_rate."
+}

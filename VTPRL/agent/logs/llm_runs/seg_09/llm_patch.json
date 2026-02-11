@@ -1,0 +1,7 @@
+{
+  "constants": {
+    "approach_dist": 0.96,
+    "collision_penalty": 1.4
+  },
+  "explanation": "The previous attempt increased collision_rate, so this new attempt reduces approach_dist by 40% and increases collision_penalty by 40%. This adjustment aims to balance progress encouragement with safety."
+}

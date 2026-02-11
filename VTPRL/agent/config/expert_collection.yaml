@@ -1,0 +1,10 @@
+# Expert Data Collection Configuration
+
+# HPRS Reward Specification
+hprs_config: "auto-shaping/configs/warehouse.yaml"
+
+# Data Collection Parameters
+target_episodes: 100
+
+# Output Settings
+dataset_name: "expert_dataset.pkl"

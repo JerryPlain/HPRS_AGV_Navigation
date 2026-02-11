@@ -1,0 +1,22 @@
+# Compare multiple models with per-model HPRS configs
+
+dataset_path: "./agent/logs/expert_dataset.pkl"
+
+# Evaluation settings
+num_episodes: 200
+max_steps: 2000
+randomize_seed: true
+base_seed: 1000
+seed_stride: 100
+
+# Output
+out_dir: "./agent/logs/compare_models"
+
+# Each case can use its own HPRS config
+cases:
+  - name: "online_baseline_best"
+    model_prefix: "./agent/logs/models/online_baseline/TD3_warm_start_Online_EGO_best"
+    hprs_config: "auto-shaping/configs/warehouse.yaml"
+  - name: "online_llm_seg09_best"
+    model_prefix: "./agent/logs/models/online_llm/seg_09/TD3_warm_start_Online_EGO_best"
+    hprs_config: "./agent/logs/llm_runs/seg_09/accepted_hprs.yaml"
