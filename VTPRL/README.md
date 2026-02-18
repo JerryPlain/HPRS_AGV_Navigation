@@ -74,20 +74,20 @@ Final accepted LLM HPRS: `agent/logs/llm_runs/seg_09/accepted_hprs.yaml`
 - `delta_dist_weight`: `1.0 -> 1.2` (introduced earlier and retained)
 
 ## 7. Segment-by-Segment Patch Trace
-Derived from `agent/logs/llm_runs/seg_*/hprs_diff.json` and `reject_reason.txt`.
+Derived from direct YAML comparison (`warehouse_llm_seg_xx.yaml` vs the previous segment's `accepted_hprs.yaml`; for `seg_01`, compare against `auto-shaping/configs/warehouse.yaml`), plus `llm_patch.json` and `reject_reason.txt`.
 
-| Segment | Patch summary | Decision | Reason (if rejected) |
-|---|---|---|---|
-| `seg_01` | `approach_dist: 2.0->1.6`, `delta_dist_weight: 1.0->1.2` | Accepted | - |
-| `seg_02` | no effective change | Rejected | success_rate dropped by 0.100 |
-| `seg_03` | no effective change | Rejected | success_rate dropped by 0.100 |
-| `seg_04` | no effective change | Accepted | previous accepted config retained |
-| `seg_05` | `collision_penalty: 1.0->0.9` | Rejected | success_rate dropped by 0.100 |
-| `seg_06` | `approach_dist: 1.6->2.24`, `delta_dist_weight: 1.2->1.68`, `laser_safe: 1.5->0.9` | Rejected | success_rate dropped by 0.100 |
-| `seg_07` | `delta_dist_weight: 1.2->1.72` | Rejected | mean_reward did not improve |
-| `seg_08` | no effective change | Accepted | previous accepted config retained |
-| `seg_09` | `approach_dist: 1.6->0.96`, `collision_penalty: 1.0->1.4` | Accepted | - |
-| `seg_10` | `delta_dist_weight: 1.2->1.24` | Rejected | success_rate dropped by 0.100 |
+| Segment | Compared against | Patch summary | Decision | Reason (if rejected) |
+|---|---|---|---|---|
+| `seg_01` | `auto-shaping/configs/warehouse.yaml` | `approach_dist: 2.0->1.6`, `delta_dist_weight: 1.0->1.2` | Accepted | - |
+| `seg_02` | `seg_01/accepted_hprs.yaml` | No YAML parameter delta because `llm_patch.constants = {}`; candidate YAML equals previous accepted HPRS | Rejected | success_rate dropped by -0.100 |
+| `seg_03` | `seg_02/accepted_hprs.yaml` | No YAML parameter delta because `llm_patch.constants = {}`; candidate YAML equals previous accepted HPRS | Rejected | success_rate dropped by -0.100 |
+| `seg_04` | `seg_03/accepted_hprs.yaml` | No YAML parameter delta because `llm_patch.constants = {}`; candidate YAML equals previous accepted HPRS | Accepted | previous accepted config retained |
+| `seg_05` | `seg_04/accepted_hprs.yaml` | `collision_penalty: 1.0->0.9` | Rejected | success_rate dropped by -0.100 |
+| `seg_06` | `seg_05/accepted_hprs.yaml` | `approach_dist: 1.6->2.24`, `delta_dist_weight: 1.2->1.68`, `laser_safe: 1.5->0.9` | Rejected | success_rate dropped by -0.100 |
+| `seg_07` | `seg_06/accepted_hprs.yaml` | `delta_dist_weight: 1.2->1.72` | Rejected | mean_reward did not improve (-0.42) |
+| `seg_08` | `seg_07/accepted_hprs.yaml` | No YAML parameter delta because `llm_patch.constants = {}`; candidate YAML equals previous accepted HPRS | Accepted | previous accepted config retained |
+| `seg_09` | `seg_08/accepted_hprs.yaml` | `approach_dist: 1.6->0.96`, `collision_penalty: 1.0->1.4` | Accepted | - |
+| `seg_10` | `seg_09/accepted_hprs.yaml` | `delta_dist_weight: 1.2->1.24` (present in YAML delta even though `llm_patch.constants` is empty) | Rejected | success_rate dropped by -0.100 |
 
 ## 8. Figures
 ### 8.1 Final model comparison
