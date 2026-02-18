@@ -1,7 +1,21 @@
 # LLM-Online HPRS Experiment Report
 
+## Table of Contents
+1. [Executive Summary](#1-executive-summary)
+2. [Objective](#2-objective)
+3. [Method Overview](#3-method-overview)
+4. [Acceptance Policy](#4-acceptance-policy)
+5. [Experimental Configuration](#5-experimental-configuration)
+6. [Quantitative Results](#6-quantitative-results)
+7. [Segment-by-Segment Patch Trace](#7-segment-by-segment-patch-trace)
+8. [Figures](#8-figures)
+9. [Reproduction Commands](#9-reproduction-commands)
+10. [Limitations and Recommended Next Steps](#10-limitations-and-recommended-next-steps)
+11. [Why the Final Parameter Changes Improved Success Rate](#11-why-the-final-parameter-changes-improved-success-rate)
+12. [Future Work](#12-future-work)
+
 ## 1. Executive Summary
-This report documents an online TD3 training pipeline where an LLM performs constrained outer-loop tuning of HPRS reward constants for AGV warehouse navigation.
+This report presents an online TD3 pipeline in which an LLM performs constrained outer-loop tuning of HPRS reward constants for AGV warehouse navigation.
 
 Key outcome (from `agent/logs/compare_models/compare_models.csv`):
 - Success rate: `0.48 -> 0.76` (`+0.28` absolute)
@@ -10,15 +24,17 @@ Key outcome (from `agent/logs/compare_models/compare_models.csv`):
 - Mean reward on successful episodes: `2.07 -> 2.38`
 - Mean episode steps: `1362.98 -> 938.81`
 
-Interpretation: the LLM-tuned configuration improves task completion and shortens episodes, but safety (collision rate) degrades under the final evaluation configuration.
+Interpretation for navigation behavior:
+- The LLM-tuned policy completes more missions and reaches goals in fewer steps.
+- The same policy is more collision-prone under final evaluation, so safety remains the key gap.
 
 ## 2. Objective
-The objective is to optimize online performance by adapting HPRS constants during training segments, while keeping the update process:
+The objective is to improve navigation performance online by adapting HPRS constants during training segments, while keeping the update process:
 - constrained (small, explicit parameter edits),
 - auditable (every patch and decision logged),
 - reversible (rejected patches do not propagate).
 
-The LLM does not train the policy network; it proposes reward-constant patches only.
+Scope boundary: the LLM does not train the policy network directly; it only proposes reward-shaping YAML edits.
 
 ## 3. Method Overview
 Each run is split into fixed-length segments. For each segment:
@@ -31,6 +47,10 @@ Each run is split into fixed-length segments. For each segment:
 
 Main orchestration script:
 - `agent/tools/run_online_llm_loop.py`
+
+Design intent:
+- Keep each update small enough to isolate causality.
+- Make every decision reproducible from logged artifacts.
 
 ## 4. Acceptance Policy
 Current acceptance policy in `run_online_llm_loop.py`:
@@ -64,6 +84,11 @@ Source: `agent/logs/compare_models/compare_models.csv`
 |---|---:|---:|---:|---:|---:|---:|
 | `online_baseline_best` | 0.48 | 0.010 | 0.000 | -11.41 | 2.07 | 1362.98 |
 | `online_llm_seg09_best` | 0.76 | 0.035 | 0.000 | -78.74 | 2.38 | 938.81 |
+
+Navigation-level reading:
+- Completion improved substantially (`+0.28` success rate).
+- Trajectories became shorter (mean steps reduced by `424.17`).
+- Safety worsened (collision rate `+0.025`), indicating a speed/safety trade-off.
 
 ### 6.2 Final HPRS constant changes
 Baseline HPRS: `auto-shaping/configs/warehouse.yaml`  
