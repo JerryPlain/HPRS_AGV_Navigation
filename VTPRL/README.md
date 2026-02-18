@@ -159,3 +159,36 @@ Together they produce trajectories that are more decisive and completion-oriente
 
 ### 11.5 Observed trade-off
 Although success improved, final comparison still shows higher collision rate (`0.010 -> 0.035`). This indicates the safety term was directionally helpful but not sufficient to fully offset the increased goal-seeking aggressiveness.
+
+## 12. Future Work
+This study demonstrates that LLM-guided HPRS tuning can improve task completion, but it also exposes several limitations that should be addressed in follow-up iterations.
+
+### 12.1 Improve Safety-Constrained Acceptance
+Current acceptance thresholds are strict on directional change but not risk-calibrated for deployment. Future work should:
+- add explicit collision-rate hard caps during acceptance,
+- incorporate safety-weighted composite scores instead of single-metric checks,
+- reject candidates that improve success but violate safety margins.
+
+### 12.2 Increase Evaluation Robustness
+Validation with limited episode counts can produce high variance decisions. Future work should:
+- use larger validation episode budgets per segment,
+- evaluate each candidate over multiple random seeds,
+- report confidence intervals for all acceptance metrics.
+
+### 12.3 Improve Patch Parsing and Traceability
+Some segments had empty `llm_patch.constants` despite meaningful explanatory text, and one segment (`seg_10`) showed a YAML delta not reflected in `llm_patch.constants`. Future work should:
+- enforce strict consistency checks between `llm_patch.json` and generated YAML,
+- fail fast when parse/apply outputs are inconsistent,
+- log a machine-readable “patch provenance” record for every segment.
+
+### 12.4 Expand Search Strategy Beyond Single-Step Local Edits
+Current updates are small and local, which improves stability but may miss better global settings. Future work should:
+- explore batched candidate proposals with parallel validation,
+- introduce adaptive step sizes based on recent acceptance history,
+- combine local edits with periodic broader re-initialization sweeps.
+
+### 12.5 Evaluate Generalization and Deployment Readiness
+Current results are tied to this warehouse setup and training regime. Future work should:
+- test across map variants, obstacle densities, and start-goal distributions,
+- measure transfer performance under dynamics and sensor noise shifts,
+- run long-horizon stress tests focused on rare safety failures.
