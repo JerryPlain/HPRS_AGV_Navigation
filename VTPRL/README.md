@@ -133,3 +133,29 @@ Current findings show a clear success-rate gain but increased collision rate in 
 2. Add a risk-adjusted objective for patch acceptance (e.g., weighted score with collision penalty).
 3. Evaluate with larger validation episode count to reduce variance before accepting patches.
 4. Track confidence intervals over repeated seeds for publication-grade statistical claims.
+
+## 11. Why the Final Parameter Changes Improved Success Rate
+Final accepted HPRS changes (vs baseline) were:
+- `approach_dist: 2.0 -> 0.96`
+- `collision_penalty: 1.0 -> 1.4`
+- `delta_dist_weight: 1.0 -> 1.2` (introduced earlier and retained)
+
+### 11.1 `approach_dist` decreased (`2.0 -> 0.96`)
+A smaller `approach_dist` tightens the effective goal-approach requirement. With a larger threshold, the agent can receive favorable shaping while still relatively far from true completion. Reducing this value pushes behavior toward finishing the final approach instead of stalling near the goal boundary, which helps convert near-success trajectories into actual successes.
+
+### 11.2 `collision_penalty` increased (`1.0 -> 1.4`)
+As progress incentives become stronger, risk control must also increase. Raising `collision_penalty` discourages unsafe shortcuts and reduces the attractiveness of aggressive trajectories that might terminate early due to collisions. This acts as a stabilizer while still allowing goal-directed motion.
+
+### 11.3 `delta_dist_weight` increased (`1.0 -> 1.2`)
+Increasing `delta_dist_weight` strengthens dense, stepwise reward for moving closer to the goal. In long-horizon navigation, this improves credit assignment and reduces dithering behavior (e.g., local oscillation or hesitation), making forward progress more consistent.
+
+### 11.4 Combined effect (why success increased)
+These three changes are complementary:
+- `delta_dist_weight` improves continuous progress pressure,
+- `approach_dist` sharpens the terminal approach objective,
+- `collision_penalty` constrains unsafe behavior while progress pressure is higher.
+
+Together they produce trajectories that are more decisive and completion-oriented, which is consistent with the observed increase in success rate and reduction in mean episode steps.
+
+### 11.5 Observed trade-off
+Although success improved, final comparison still shows higher collision rate (`0.010 -> 0.035`). This indicates the safety term was directionally helpful but not sufficient to fully offset the increased goal-seeking aggressiveness.
