@@ -192,3 +192,28 @@ Current results are tied to this warehouse setup and training regime. Future wor
 - test across map variants, obstacle densities, and start-goal distributions,
 - measure transfer performance under dynamics and sensor noise shifts,
 - run long-horizon stress tests focused on rare safety failures.
+
+### 12.6 Introduce Multi-Agent LLM Tuning
+The current loop uses a single LLM proposer. A stronger design is a multi-agent setup with specialized roles, for example:
+- a proposer agent that generates candidate edits,
+- a safety critic agent that audits collision and risk implications,
+- a verifier agent that checks config validity and consistency,
+- an arbiter agent that selects the final candidate using explicit acceptance rules.
+
+This can improve proposal quality, reduce invalid edits, and make rejection reasoning more robust.
+
+### 12.7 Move Beyond Parameter-Only Edits (Spec-Level Optimization)
+Current tuning primarily modifies `constants`. Future work should also allow controlled edits to YAML `specs` (reward logic structure), such as:
+- adding/removing shaping clauses under strict safety constraints,
+- re-ordering or re-weighting objective priorities,
+- introducing context-gated terms for different navigation phases.
+
+Because spec-level edits are higher risk, they should be guarded by schema checks, static rule validation, and rollback-safe evaluation.
+
+### 12.8 Run Longer and Multi-Phase Training Cycles
+The current 10-segment loop may be too short to fully realize stable policy adaptation. Future work should:
+- run more segments and larger step budgets per segment,
+- use staged optimization (coarse exploration -> fine local tuning),
+- periodically re-evaluate accepted HPRS against a broader benchmark suite.
+
+Longer-horizon optimization can better separate short-term metric noise from genuinely strong reward-shaping improvements.
