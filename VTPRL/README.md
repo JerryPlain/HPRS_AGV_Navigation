@@ -1,99 +1,113 @@
 # LLM-Online HPRS Experiment Report
-## 1. Goal
-Use an LLM to adapt HPRS reward shaping constants during online TD3 training to improve success rate, while keeping collision rate from getting worse. The LLM does not train the policy; it only proposes small, controlled HPRS adjustments.
 
-## 2. Design Rationale
-- Training is already heavy. Putting an LLM inside the training loop is slow and unstable.
-- The LLM is better used as an external tuner that reads concise summaries and proposes small parameter changes.
-- This keeps the process controllable, explainable, and reproducible.
+## 1. Executive Summary
+This report documents an online TD3 training pipeline where an LLM performs constrained outer-loop tuning of HPRS reward constants for AGV warehouse navigation.
 
-## 3. End-to-End Workflow
-Each run is divided into multiple segments. For each segment:
+Key outcome (from `agent/logs/compare_models/compare_models.csv`):
+- Success rate: `0.48 -> 0.76` (`+0.28` absolute)
+- Collision rate: `0.010 -> 0.035` (`+0.025` absolute)
+- Mean reward: `-11.41 -> -78.74`
+- Mean reward on successful episodes: `2.07 -> 2.38`
+- Mean episode steps: `1362.98 -> 938.81`
 
-1) Train for a short segment.
-2) Summarize results (monitor.csv -> run_summary.json).
-3) LLM proposes a patch (limited to 2 constants).
-4) Apply patch to generate a new HPRS YAML.
-5) Validate old vs new HPRS.
-6) Accept or reject based on a clear rule.
+Interpretation: the LLM-tuned configuration improves task completion and shortens episodes, but safety (collision rate) degrades under the final evaluation configuration.
 
-All outputs are logged per segment.
+## 2. Objective
+The objective is to optimize online performance by adapting HPRS constants during training segments, while keeping the update process:
+- constrained (small, explicit parameter edits),
+- auditable (every patch and decision logged),
+- reversible (rejected patches do not propagate).
 
-## 4. Inputs and Outputs
+The LLM does not train the policy network; it proposes reward-constant patches only.
 
-### Training (per segment)
-Script: `agent/tools/run_online_llm_loop.py`
-- Input: `online_td3_llm.yaml` (segment_steps, pretrained path, etc.)
-- Output: checkpoints, `monitor.csv`
+## 3. Method Overview
+Each run is split into fixed-length segments. For each segment:
+1. Train online TD3 for `segment_steps`.
+2. Summarize `monitor.csv` to `run_summary.json`.
+3. Ask LLM to propose a small JSON patch on HPRS constants.
+4. Apply patch to produce `warehouse_llm_seg_xx.yaml`.
+5. Validate old vs. new HPRS on the same model.
+6. Accept or reject patch based on predefined rules.
 
-### Summary
-Script: `agent/tools/llm_summarize_run.py`
-- Input: `monitor.csv`
-- Output: `run_summary.json` (success_rate, collision_rate, mean_reward, mean_length, etc.)
+Main orchestration script:
+- `agent/tools/run_online_llm_loop.py`
 
-### Patch Proposal
-Script: `agent/tools/run_llm_pipeline.py`
-- Input: current HPRS, `run_summary.json`, optional previous reject reason
-- Output: `llm_patch.json`
+## 4. Acceptance Policy
+Current acceptance policy in `run_online_llm_loop.py`:
+- `success_rate` must not decrease (within `accept_delta`),
+- `collision_rate` must not increase (within `accept_collision_delta`),
+- if success and collision are effectively unchanged, `mean_reward` must improve by at least `accept_reward_delta`.
 
-### Apply Patch
-Script: `agent/tools/llm_apply_patch.py`
-- Input: patch + base HPRS
-- Output: `warehouse_llm_seg_xx.yaml`
+For this run (`agent/logs/llm_runs/llm_loop_summary.json`):
+- `accept_delta = 0.0`
+- `accept_collision_delta = 0.0`
+- `accept_reward_delta = 0.1`
 
-### Validation
-Script: `agent/tools/run_online_llm_loop.py`
-- Input: old HPRS vs new HPRS, same model
-- Output: acceptance decision + reject logs (if any)
+## 5. Experimental Configuration
+### 5.1 Pipeline
+1. Expert collection (A* + DWA): `agent/expert/run_expert.py`
+2. Offline pretraining (TD3-BC): `agent/td3/td3bc/train_td3bc.py`
+3. Online baseline TD3: `agent/td3/online_td3/train_online_td3.py`
+4. LLM online loop: `agent/tools/run_online_llm_loop.py`
 
-## 5. Acceptance Rule
-Current rule:
-- success_rate must not drop
-- collision_rate must not increase
-- if success_rate and collision_rate are unchanged, mean_reward must improve
+### 5.2 Core configs
+- Offline: `agent/config/offline_td3_bc.yaml`
+- Online baseline: `agent/config/online_td3_baseline.yaml`
+- Online LLM: `agent/config/online_td3_llm.yaml`
+- Final comparison: `agent/config/evaluate_compare_models.yaml`
 
-This is implemented in `agent/tools/run_online_llm_loop.py`.
+## 6. Quantitative Results
+### 6.1 Final baseline vs LLM comparison
+Source: `agent/logs/compare_models/compare_models.csv`
 
-## 6. LLM Patch Constraints
-Prompt constraints:
-- Modify exactly 2 constants (1 progress + 1 safety)
-- Each change within +/-40%
-- Prefer small changes (10-20%) unless success_rate is very low
-- Must output JSON only, wrapped by BEGIN_JSON / END_JSON
-- Must include a short explanation grounded in the summary
+| Model | Success | Collision | Timeout | Mean Reward | Mean Success Reward | Mean Steps |
+|---|---:|---:|---:|---:|---:|---:|
+| `online_baseline_best` | 0.48 | 0.010 | 0.000 | -11.41 | 2.07 | 1362.98 |
+| `online_llm_seg09_best` | 0.76 | 0.035 | 0.000 | -78.74 | 2.38 | 938.81 |
 
-Implementation: `agent/tools/llm_propose_patch.py` and `agent/tools/run_llm_pipeline.py`.
+### 6.2 Final HPRS constant changes
+Baseline HPRS: `auto-shaping/configs/warehouse.yaml`  
+Final accepted LLM HPRS: `agent/logs/llm_runs/seg_09/accepted_hprs.yaml`
 
-## 7. Failure Feedback Loop
-If a patch is rejected:
-- Reject reason is computed and written to `reject_reason.txt`
-- The reason is fed into the next LLM prompt
-This avoids repeating known-bad directions.
+- `approach_dist`: `2.0 -> 0.96`
+- `collision_penalty`: `1.0 -> 1.4`
+- `delta_dist_weight`: `1.0 -> 1.2` (introduced earlier and retained)
 
-## 8. Logging and Artifacts
-Per segment:
-- `online_td3_seg.yaml`
-- `monitor.csv`
-- `run_summary.json`
-- `llm_patch.json`
-- `warehouse_llm_seg_xx.yaml`
-- `hprs_diff.json`
-- `reject.json` / `reject_reason.txt` (if rejected)
+## 7. Segment-by-Segment Patch Trace
+Derived from `agent/logs/llm_runs/seg_*/hprs_diff.json` and `reject_reason.txt`.
 
-Global:
-- `agent/logs/llm_runs/llm_loop_summary.json`
+| Segment | Patch summary | Decision | Reason (if rejected) |
+|---|---|---|---|
+| `seg_01` | `approach_dist: 2.0->1.6`, `delta_dist_weight: 1.0->1.2` | Accepted | - |
+| `seg_02` | no effective change | Rejected | success_rate dropped by 0.100 |
+| `seg_03` | no effective change | Rejected | success_rate dropped by 0.100 |
+| `seg_04` | no effective change | Accepted | previous accepted config retained |
+| `seg_05` | `collision_penalty: 1.0->0.9` | Rejected | success_rate dropped by 0.100 |
+| `seg_06` | `approach_dist: 1.6->2.24`, `delta_dist_weight: 1.2->1.68`, `laser_safe: 1.5->0.9` | Rejected | success_rate dropped by 0.100 |
+| `seg_07` | `delta_dist_weight: 1.2->1.72` | Rejected | mean_reward did not improve |
+| `seg_08` | no effective change | Accepted | previous accepted config retained |
+| `seg_09` | `approach_dist: 1.6->0.96`, `collision_penalty: 1.0->1.4` | Accepted | - |
+| `seg_10` | `delta_dist_weight: 1.2->1.24` | Rejected | success_rate dropped by 0.100 |
 
-## 9. How to Run
+## 8. Figures
+### 8.1 Final model comparison
+![Final baseline vs LLM comparison](agent/logs/compare_models/compare_models_bars.png)
 
-### Baseline Online
-```
+### 8.2 Offline checkpoint diagnostics
+![Offline checkpoint comparison (bars)](agent/logs/compare_checkpoints_bars.png)
+
+![Offline checkpoint comparison (lines)](agent/logs/compare_checkpoints_lines.png)
+
+## 9. Reproduction Commands
+### 9.1 Online baseline
+```bash
 python agent/td3/online_td3/train_online_td3.py \
   --mode warm_start \
   --config agent/config/online_td3_baseline.yaml
 ```
 
-### LLM-Online
-```
+### 9.2 LLM-online loop
+```bash
 python agent/tools/run_online_llm_loop.py \
   --base_config agent/config/online_td3_llm.yaml \
   --segments 10 \
@@ -106,72 +120,16 @@ python agent/tools/run_online_llm_loop.py \
   --val_verbose
 ```
 
-## 10. Evaluation (Separate HPRS per Model)
-
-Config: `agent/config/evaluate_compare_models.yaml`  
-Script: `agent/tools/compare_models_with_hprs.py`
-
-```
+### 9.3 Final comparison
+```bash
 python agent/tools/compare_models_with_hprs.py \
   --config agent/config/evaluate_compare_models.yaml \
   --verbose
 ```
 
-Outputs:
-- `agent/logs/compare_models/compare_models.csv`
-- `agent/logs/compare_models/compare_models_bars.png`
-
-## 11. Concrete Results
-
-### 11.1 Final Comparison (Baseline vs LLM)
-
-Source: `agent/logs/compare_models/compare_models.csv`
-Chart: `agent/logs/compare_models/compare_models_bars.png`
-
-### 11.2 Final HPRS Changes (Baseline → LLM Final)
-
-Comparing `auto-shaping/configs/warehouse.yaml` vs  
-`agent/logs/llm_runs/seg_09/warehouse_llm_seg_09.yaml`:
-
-- `approach_dist`: **2.0 → 0.96**
-- `collision_penalty`: **1.0 → 1.4**
-- `delta_dist_weight`: **1.0 → 1.2**
-
-## 12. Improvement Process (Segment-by-Segment)
-
-This summarizes each segment’s HPRS changes and accept/reject outcome:
-
-- **seg_01** (accepted)  
-  `approach_dist: 2.0 → 1.6`, `delta_dist_weight: 1.0 → 1.2`
-- **seg_02** (rejected)  
-  no changes (rejected: success_rate dropped)
-- **seg_03** (rejected)  
-  no changes (rejected: success_rate dropped)
-- **seg_04** (accepted)  
-  no changes (kept previous)
-- **seg_05** (rejected)  
-  `collision_penalty: 1.0 → 0.9` (rejected: success_rate dropped)
-- **seg_06** (rejected)  
-  `approach_dist: 1.6 → 2.24`, `delta_dist_weight: 1.2 → 1.68`, `laser_safe: 1.5 → 0.9`
-- **seg_07** (rejected)  
-  `delta_dist_weight: 1.2 → 1.72` (rejected: mean_reward not improved)
-- **seg_08** (accepted)  
-  no changes (kept previous)
-- **seg_09** (accepted)  
-  `approach_dist: 1.6 → 0.96`, `collision_penalty: 1.0 → 1.4`
-- **seg_10** (rejected)  
-  `delta_dist_weight: 1.2 → 1.24` (rejected: success_rate dropped)
-
-## 13. Notes on Interpretation
-
-- The LLM policy improved success rate (0.48 → 0.76) but at a cost of higher collision rate (0.01 → 0.035).
-- Mean reward decreased for the LLM model, while mean success reward improved slightly.
-- If success rate is the primary target, the LLM‑tuned HPRS is favorable; if safety or reward is critical, tighten acceptance constraints.
-
-## 14. Summary
-This system enables safe and interpretable HPRS tuning during online RL by:
-- keeping changes small and traceable
-- validating each proposed update
-- using LLMs as a controlled outer‑loop optimizer
-
-The result is a structured, reproducible pipeline for LLM‑driven reward shaping.
+## 10. Limitations and Recommended Next Steps
+Current findings show a clear success-rate gain but increased collision rate in final comparison. Recommended follow-up:
+1. Tighten acceptance policy for safety-dominant deployment (`accept_collision_delta < 0` or explicit collision hard-threshold).
+2. Add a risk-adjusted objective for patch acceptance (e.g., weighted score with collision penalty).
+3. Evaluate with larger validation episode count to reduce variance before accepting patches.
+4. Track confidence intervals over repeated seeds for publication-grade statistical claims.
