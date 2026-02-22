@@ -18,7 +18,6 @@ End-to-end AGV warehouse navigation training pipeline:
 - [Monitoring](#monitoring)
 - [Evaluation](#evaluation)
 - [Project Layout](#project-layout)
-- [Docs](#docs)
 
 ## Core Workflow
 
