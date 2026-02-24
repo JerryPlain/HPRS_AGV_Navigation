@@ -21,19 +21,16 @@ End-to-end AGV warehouse navigation training pipeline:
 
 ## Core Workflow
 
-```text
-Expert Collection (A* + DWA)
-            |
-            v
-Offline TD3-BC Pretraining
-            |
-            v
-Checkpoint Selection
-            |
-            v
-Online TD3 (scratch / warm_start)
-            |
-            +--> Optional LLM Loop (HPRS reward patch -> validation -> accept/reject)
+```mermaid
+flowchart TD
+    A[Expert Collection<br/>A* + DWA] --> B[Offline Pretraining<br/>TD3-BC]
+    B --> C[Checkpoint Selection]
+    C --> D[Online TD3<br/>scratch or warm_start]
+    D --> E{{Optional LLM-HPRS Loop}}
+    E --> F[Propose HPRS Patch]
+    F --> G[Validation]
+    G --> H[Accept or Reject]
+    H --> E
 ```
 
 ## Environment Setup
