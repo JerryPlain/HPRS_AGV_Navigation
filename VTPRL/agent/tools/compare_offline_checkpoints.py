@@ -124,44 +124,120 @@ def _try_plot(results: Dict[str, Dict[str, float]], out_dir: str) -> None:
         print("[Compare] matplotlib not found. Writing CSV only.")
         return
 
+    def _configure_plot_style() -> None:
+        plt.rcParams.update(
+            {
+                "text.usetex": True,
+                "font.family": "serif",
+                "font.serif": ["Computer Modern Roman"],
+                "axes.labelsize": 12,
+                "font.size": 12,
+                "legend.fontsize": 10,
+                "xtick.labelsize": 10,
+                "ytick.labelsize": 10,
+                "figure.figsize": (12, 4.5),
+                "axes.spines.top": False,
+                "axes.spines.right": False,
+            }
+        )
+
+    def _apply_style_with_fallback() -> bool:
+        _configure_plot_style()
+        fig = plt.figure()
+        try:
+            fig.canvas.draw()
+            return True
+        except Exception as exc:
+            print(f"[Compare] LaTeX rendering unavailable, fallback to matplotlib text: {exc}")
+            plt.close(fig)
+            plt.rcParams.update({"text.usetex": False})
+            return False
+        finally:
+            if plt.fignum_exists(fig.number):
+                plt.close(fig)
+
+    use_tex = _apply_style_with_fallback()
     labels = list(results.keys())
     x = np.arange(len(labels))
     pretty_labels = [lbl.replace("td3_bc_offline_", "").replace("step_", "") for lbl in labels]
     success = [results[k]["success_rate"] for k in labels]
     reward = [results[k]["mean_reward_success"] for k in labels]
     steps = [results[k]["mean_steps_success"] for k in labels]
+    colors = ["#2d3748", "#4a5568", "#718096", "#a0aec0"]
+    title_prefix = r"\textbf{" if use_tex else ""
+    title_suffix = "}" if use_tex else ""
 
-    fig, axs = plt.subplots(1, 3, figsize=(12, 4))
-    bars0 = axs[0].bar(x, success)
-    axs[0].set_title("Success Rate")
+    fig, axs = plt.subplots(1, 3)
+    bars0 = axs[0].bar(x, success, color=colors[: len(x)], edgecolor="black", linewidth=0.8, width=0.6)
+    axs[0].set_title(f"{title_prefix}Success Rate{title_suffix}")
+    axs[0].set_xlabel("Checkpoint")
+    axs[0].set_ylabel("Rate")
     axs[0].set_ylim(0, 1.0)
     axs[0].set_xticks(x)
     axs[0].set_xticklabels(pretty_labels, rotation=25, ha="right")
+    axs[0].yaxis.grid(True, linestyle="--", alpha=0.3)
+    axs[0].set_axisbelow(True)
     for b in bars0:
         h = b.get_height()
-        axs[0].annotate(f"{h:.3f}", (b.get_x() + b.get_width() / 2, h), ha="center", va="bottom", fontsize=8)
+        axs[0].annotate(
+            f"{h:.3f}",
+            (b.get_x() + b.get_width() / 2, h),
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            xytext=(0, 4),
+            textcoords="offset points",
+        )
 
-    bars1 = axs[1].bar(x, reward)
-    axs[1].set_title("Mean Reward (Success Only)")
+    bars1 = axs[1].bar(x, reward, color=colors[: len(x)], edgecolor="black", linewidth=0.8, width=0.6)
+    axs[1].set_title(f"{title_prefix}Mean Reward (Success Only){title_suffix}")
+    axs[1].set_xlabel("Checkpoint")
+    axs[1].set_ylabel("Reward")
     axs[1].set_xticks(x)
     axs[1].set_xticklabels(pretty_labels, rotation=25, ha="right")
+    axs[1].yaxis.grid(True, linestyle="--", alpha=0.3)
+    axs[1].set_axisbelow(True)
     for b in bars1:
         h = b.get_height()
-        axs[1].annotate(f"{h:.2f}", (b.get_x() + b.get_width() / 2, h), ha="center", va="bottom", fontsize=8)
+        axs[1].annotate(
+            f"{h:.2f}",
+            (b.get_x() + b.get_width() / 2, h),
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            xytext=(0, 4),
+            textcoords="offset points",
+        )
 
-    bars2 = axs[2].bar(x, steps)
-    axs[2].set_title("Mean Steps (Success Only)")
+    bars2 = axs[2].bar(x, steps, color=colors[: len(x)], edgecolor="black", linewidth=0.8, width=0.6)
+    axs[2].set_title(f"{title_prefix}Mean Steps (Success Only){title_suffix}")
+    axs[2].set_xlabel("Checkpoint")
+    axs[2].set_ylabel("Steps")
     axs[2].set_xticks(x)
     axs[2].set_xticklabels(pretty_labels, rotation=25, ha="right")
+    axs[2].yaxis.grid(True, linestyle="--", alpha=0.3)
+    axs[2].set_axisbelow(True)
     for b in bars2:
         h = b.get_height()
-        axs[2].annotate(f"{h:.1f}", (b.get_x() + b.get_width() / 2, h), ha="center", va="bottom", fontsize=8)
+        axs[2].annotate(
+            f"{h:.1f}",
+            (b.get_x() + b.get_width() / 2, h),
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            xytext=(0, 4),
+            textcoords="offset points",
+        )
 
     fig.tight_layout()
     Path(out_dir).mkdir(parents=True, exist_ok=True)
     out_path = os.path.join(out_dir, "compare_checkpoints_bars.png")
     fig.savefig(out_path, dpi=150)
     print(f"[Compare] Saved bar plot: {out_path}")
+    pdf_path = os.path.join(out_dir, "compare_checkpoints_bars.pdf")
+    fig.savefig(pdf_path)
+    print(f"[Compare] Saved bar plot PDF: {pdf_path}")
+    plt.close(fig)
 
     fig2, axs2 = plt.subplots(1, 3, figsize=(12, 4))
     axs2[0].plot(x, success, marker="o")
@@ -182,6 +258,7 @@ def _try_plot(results: Dict[str, Dict[str, float]], out_dir: str) -> None:
     out_path2 = os.path.join(out_dir, "compare_checkpoints_lines.png")
     fig2.savefig(out_path2, dpi=150)
     print(f"[Compare] Saved line plot: {out_path2}")
+    plt.close(fig2)
 
 
 def _write_csv(results: Dict[str, Dict[str, float]], out_dir: str) -> str:

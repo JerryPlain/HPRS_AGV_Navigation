@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="470" viewBox="0 0 1320 470">
+<style>
+  .bg { fill: #ffffff; }
+  .title { font-family: 'CMU Serif', 'Computer Modern Serif', 'Latin Modern Roman', 'Times New Roman', serif; font-size: 20px; font-weight: 700; }
+  .label { font-family: 'CMU Serif', 'Computer Modern Serif', 'Latin Modern Roman', 'Times New Roman', serif; font-size: 18px; }
+  .tick { font-family: 'CMU Serif', 'Computer Modern Serif', 'Latin Modern Roman', 'Times New Roman', serif; font-size: 14px; }
+  .value { font-family: 'CMU Serif', 'Computer Modern Serif', 'Latin Modern Roman', 'Times New Roman', serif; font-size: 14px; }
+  .axis { stroke: #000000; stroke-width: 1.2; }
+  .grid { stroke: #000000; stroke-width: 0.8; stroke-dasharray: 4 5; opacity: 0.22; }
+</style>
+<rect class="bg" x="0" y="0" width="1320" height="470"/>
+<text x="220.0" y="38" text-anchor="middle" class="title">Success Rate</text>
+<text x="18" y="225.0" transform="rotate(-90 18,225.0)" text-anchor="middle" class="label">Rate</text>
+<line x1="78" y1="374" x2="410" y2="374" class="axis"/>
+<line x1="78" y1="56" x2="78" y2="374" class="axis"/>
+<line x1="78" y1="374.0" x2="410" y2="374.0" class="grid"/>
+<text x="68" y="378.0" text-anchor="end" class="tick">0.000</text>
+<line x1="78" y1="294.5" x2="410" y2="294.5" class="grid"/>
+<text x="68" y="298.5" text-anchor="end" class="tick">0.250</text>
+<line x1="78" y1="215.0" x2="410" y2="215.0" class="grid"/>
+<text x="68" y="219.0" text-anchor="end" class="tick">0.500</text>
+<line x1="78" y1="135.5" x2="410" y2="135.5" class="grid"/>
+<text x="68" y="139.5" text-anchor="end" class="tick">0.750</text>
+<line x1="78" y1="56.0" x2="410" y2="56.0" class="grid"/>
+<text x="68" y="60.0" text-anchor="end" class="tick">1.000</text>
+<rect x="96.4" y="65.5" width="46.1" height="308.5" fill="#2d3748" stroke="#000000" stroke-width="1.1"/>
+<text x="119.5" y="57.5" text-anchor="middle" class="value">0.970</text>
+<text x="119.5" y="392.0" text-anchor="middle" class="tick" transform="rotate(-25 119.5,392.0)">10000</text>
+<rect x="179.4" y="63.9" width="46.1" height="310.1" fill="#4a5568" stroke="#000000" stroke-width="1.1"/>
+<text x="202.5" y="55.9" text-anchor="middle" class="value">0.975</text>
+<text x="202.5" y="392.0" text-anchor="middle" class="tick" transform="rotate(-25 202.5,392.0)">20000</text>
+<rect x="262.4" y="63.9" width="46.1" height="310.1" fill="#718096" stroke="#000000" stroke-width="1.1"/>
+<text x="285.5" y="55.9" text-anchor="middle" class="value">0.975</text>
+<text x="285.5" y="392.0" text-anchor="middle" class="tick" transform="rotate(-25 285.5,392.0)">30000</text>
+<rect x="345.4" y="65.5" width="46.1" height="308.5" fill="#a0aec0" stroke="#000000" stroke-width="1.1"/>
+<text x="368.5" y="57.5" text-anchor="middle" class="value">0.970</text>
+<text x="368.5" y="392.0" text-anchor="middle" class="tick" transform="rotate(-25 368.5,392.0)">40000</text>
+<text x="220.0" y="420" text-anchor="middle" class="label">Checkpoint</text><text x="660.0" y="38" text-anchor="middle" class="title">Mean Reward (Success Only)</text>
+<text x="458" y="225.0" transform="rotate(-90 458,225.0)" text-anchor="middle" class="label">Reward</text>
+<line x1="518" y1="374" x2="850" y2="374" class="axis"/>
+<line x1="518" y1="56" x2="518" y2="374" class="axis"/>
+<line x1="518" y1="374.0" x2="850" y2="374.0" class="grid"/>
+<text x="508" y="378.0" text-anchor="end" class="tick">-6</text>
+<line x1="518" y1="294.5" x2="850" y2="294.5" class="grid"/>
+<text x="508" y="298.5" text-anchor="end" class="tick">-3</text>
+<line x1="518" y1="215.0" x2="850" y2="215.0" class="grid"/>
+<text x="508" y="219.0" text-anchor="end" class="tick">-1</text>
+<line x1="518" y1="135.5" x2="850" y2="135.5" class="grid"/>
+<text x="508" y="139.5" text-anchor="end" class="tick">2</text>
+<line x1="518" y1="56.0" x2="850" y2="56.0" class="grid"/>
+<text x="508" y="60.0" text-anchor="end" class="tick">4</text>
+<rect x="536.4" y="260.4" width="46.1" height="113.6" fill="#2d3748" stroke="#000000" stroke-width="1.1"/>
+<text x="559.5" y="252.4" text-anchor="middle" class="value">-2.32</text>
+<text x="559.5" y="392.0" text-anchor="middle" class="tick" transform="rotate(-25 559.5,392.0)">10000</text>
+<rect x="619.4" y="125.6" width="46.1" height="248.4" fill="#4a5568" stroke="#000000" stroke-width="1.1"/>
+<text x="642.5" y="117.6" text-anchor="middle" class="value">1.92</text>
+<text x="642.5" y="392.0" text-anchor="middle" class="tick" transform="rotate(-25 642.5,392.0)">20000</text>
+<rect x="702.4" y="119.7" width="46.1" height="254.3" fill="#718096" stroke="#000000" stroke-width="1.1"/>
+<text x="725.5" y="111.7" text-anchor="middle" class="value">2.10</text>
+<text x="725.5" y="392.0" text-anchor="middle" class="tick" transform="rotate(-25 725.5,392.0)">30000</text>
+<rect x="785.4" y="310.3" width="46.1" height="63.7" fill="#a0aec0" stroke="#000000" stroke-width="1.1"/>
+<text x="808.5" y="302.3" text-anchor="middle" class="value">-3.88</text>
+<text x="808.5" y="392.0" text-anchor="middle" class="tick" transform="rotate(-25 808.5,392.0)">40000</text>
+<text x="660.0" y="420" text-anchor="middle" class="label">Checkpoint</text><text x="1100.0" y="38" text-anchor="middle" class="title">Mean Steps (Success Only)</text>
+<text x="898" y="225.0" transform="rotate(-90 898,225.0)" text-anchor="middle" class="label">Steps</text>
+<line x1="958" y1="374" x2="1290" y2="374" class="axis"/>
+<line x1="958" y1="56" x2="958" y2="374" class="axis"/>
+<line x1="958" y1="374.0" x2="1290" y2="374.0" class="grid"/>
+<text x="948" y="378.0" text-anchor="end" class="tick">520</text>
+<line x1="958" y1="294.5" x2="1290" y2="294.5" class="grid"/>
+<text x="948" y="298.5" text-anchor="end" class="tick">540</text>
+<line x1="958" y1="215.0" x2="1290" y2="215.0" class="grid"/>
+<text x="948" y="219.0" text-anchor="end" class="tick">560</text>
+<line x1="958" y1="135.5" x2="1290" y2="135.5" class="grid"/>
+<text x="948" y="139.5" text-anchor="end" class="tick">580</text>
+<line x1="958" y1="56.0" x2="1290" y2="56.0" class="grid"/>
+<text x="948" y="60.0" text-anchor="end" class="tick">600</text>
+<rect x="976.4" y="272.6" width="46.1" height="101.4" fill="#2d3748" stroke="#000000" stroke-width="1.1"/>
+<text x="999.5" y="264.6" text-anchor="middle" class="value">545.5</text>
+<text x="999.5" y="392.0" text-anchor="middle" class="tick" transform="rotate(-25 999.5,392.0)">10000</text>
+<rect x="1059.4" y="333.0" width="46.1" height="41.0" fill="#4a5568" stroke="#000000" stroke-width="1.1"/>
+<text x="1082.5" y="325.0" text-anchor="middle" class="value">530.3</text>
+<text x="1082.5" y="392.0" text-anchor="middle" class="tick" transform="rotate(-25 1082.5,392.0)">20000</text>
+<rect x="1142.4" y="133.0" width="46.1" height="241.0" fill="#718096" stroke="#000000" stroke-width="1.1"/>
+<text x="1165.5" y="125.0" text-anchor="middle" class="value">580.6</text>
+<text x="1165.5" y="392.0" text-anchor="middle" class="tick" transform="rotate(-25 1165.5,392.0)">30000</text>
+<rect x="1225.4" y="153.4" width="46.1" height="220.6" fill="#a0aec0" stroke="#000000" stroke-width="1.1"/>
+<text x="1248.5" y="145.4" text-anchor="middle" class="value">575.5</text>
+<text x="1248.5" y="392.0" text-anchor="middle" class="tick" transform="rotate(-25 1248.5,392.0)">40000</text>
+<text x="1100.0" y="420" text-anchor="middle" class="label">Checkpoint</text>
+</svg>
