@@ -164,7 +164,7 @@ def build_panel_pdf(
     for gv in grid_values:
         ratio = 0.0 if ymax == ymin else (gv - ymin) / (ymax - ymin)
         y = bottom - ratio * plot_h
-        parts.append(pdf_line(left, fy(y), right, fy(y), 0.8, "[4 5] 0 d"))
+        parts.append(pdf_line(left, fy(y), right, fy(y), 0.8))
         tick_text = fmt(gv, digits if ymax <= 2 else 0)
         parts.append(pdf_text(left - 38, fy(y + 4), 10, tick_text))
 
@@ -304,7 +304,7 @@ def main() -> None:
   .tick {{ font-family: 'CMU Serif', 'Computer Modern Serif', 'Latin Modern Roman', 'Times New Roman', serif; font-size: 14px; }}
   .value {{ font-family: 'CMU Serif', 'Computer Modern Serif', 'Latin Modern Roman', 'Times New Roman', serif; font-size: 14px; }}
   .axis {{ stroke: #000000; stroke-width: 1.2; }}
-  .grid {{ stroke: #000000; stroke-width: 0.8; stroke-dasharray: 4 5; opacity: 0.22; }}
+  .grid {{ stroke: #000000; stroke-width: 0.8; opacity: 0.22; }}
 </style>
 <rect class="bg" x="0" y="0" width="{width}" height="{height}"/>
 {''.join(panels)}

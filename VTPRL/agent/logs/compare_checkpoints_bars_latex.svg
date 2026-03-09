@@ -6,7 +6,7 @@
   .tick { font-family: 'CMU Serif', 'Computer Modern Serif', 'Latin Modern Roman', 'Times New Roman', serif; font-size: 14px; }
   .value { font-family: 'CMU Serif', 'Computer Modern Serif', 'Latin Modern Roman', 'Times New Roman', serif; font-size: 14px; }
   .axis { stroke: #000000; stroke-width: 1.2; }
-  .grid { stroke: #000000; stroke-width: 0.8; stroke-dasharray: 4 5; opacity: 0.22; }
+  .grid { stroke: #000000; stroke-width: 0.8; opacity: 0.22; }
 </style>
 <rect class="bg" x="0" y="0" width="1320" height="470"/>
 <text x="220.0" y="38" text-anchor="middle" class="title">Success Rate</text>
