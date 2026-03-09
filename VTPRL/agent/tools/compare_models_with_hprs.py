@@ -103,27 +103,67 @@ def _try_plot(results: Dict[str, Dict[str, float]], out_dir: Path) -> None:
         print("[Compare] matplotlib not found. Skipping plot.")
         return
 
+    def _configure_plot_style() -> None:
+        plt.rcParams.update(
+            {
+                "text.usetex": True,
+                "font.family": "serif",
+                "font.serif": ["Computer Modern Roman"],
+                "axes.labelsize": 12,
+                "font.size": 12,
+                "legend.fontsize": 10,
+                "xtick.labelsize": 10,
+                "ytick.labelsize": 10,
+                "figure.figsize": (16, 4.5),
+                "axes.spines.top": False,
+                "axes.spines.right": False,
+            }
+        )
+
+    def _apply_style_with_fallback() -> bool:
+        _configure_plot_style()
+        fig = plt.figure()
+        try:
+            fig.canvas.draw()
+            return True
+        except Exception as exc:
+            print(f"[Compare] LaTeX rendering unavailable, fallback to matplotlib text: {exc}")
+            plt.close(fig)
+            plt.rcParams.update({"text.usetex": False})
+            return False
+        finally:
+            if plt.fignum_exists(fig.number):
+                plt.close(fig)
+
+    use_tex = _apply_style_with_fallback()
     labels = list(results.keys())
     success = [results[k]["success_rate"] for k in labels]
     collision = [results[k]["collision_rate"] for k in labels]
     success_rew = [results[k]["mean_reward_success"] for k in labels]
     steps = [results[k]["mean_steps"] for k in labels]
+    colors = ["#2d3748", "#4a5568", "#718096", "#a0aec0"]
+    title_prefix = r"\textbf{" if use_tex else ""
+    title_suffix = "}" if use_tex else ""
 
-    fig, axs = plt.subplots(1, 4, figsize=(16, 4))
+    fig, axs = plt.subplots(1, 4)
 
-    bars0 = axs[0].bar(labels, success)
-    axs[0].set_title("Success Rate")
+    bars0 = axs[0].bar(labels, success, color=colors[: len(labels)], edgecolor="black", linewidth=0.8, width=0.6)
+    axs[0].set_title(f"{title_prefix}Success Rate{title_suffix}")
+    axs[0].set_ylabel("Rate")
     axs[0].set_ylim(0, 1.0)
 
-    bars1 = axs[1].bar(labels, collision)
-    axs[1].set_title("Collision Rate")
+    bars1 = axs[1].bar(labels, collision, color=colors[: len(labels)], edgecolor="black", linewidth=0.8, width=0.6)
+    axs[1].set_title(f"{title_prefix}Collision Rate{title_suffix}")
+    axs[1].set_ylabel("Rate")
     axs[1].set_ylim(0, 1.0)
 
-    bars2 = axs[2].bar(labels, success_rew)
-    axs[2].set_title("Mean Success Reward")
+    bars2 = axs[2].bar(labels, success_rew, color=colors[: len(labels)], edgecolor="black", linewidth=0.8, width=0.6)
+    axs[2].set_title(f"{title_prefix}Mean Success Reward{title_suffix}")
+    axs[2].set_ylabel("Reward")
 
-    bars3 = axs[3].bar(labels, steps)
-    axs[3].set_title("Mean Steps")
+    bars3 = axs[3].bar(labels, steps, color=colors[: len(labels)], edgecolor="black", linewidth=0.8, width=0.6)
+    axs[3].set_title(f"{title_prefix}Mean Steps{title_suffix}")
+    axs[3].set_ylabel("Steps")
 
     def _annotate(ax, bars, fmt="{:.2f}"):
         for b in bars:
@@ -134,7 +174,9 @@ def _try_plot(results: Dict[str, Dict[str, float]], out_dir: Path) -> None:
                 fmt.format(val),
                 ha="center",
                 va="bottom",
-                fontsize=8,
+                fontsize=9,
+                xytext=(0, 4),
+                textcoords="offset points",
             )
 
     _annotate(axs[0], bars0, fmt="{:.2f}")
@@ -143,12 +185,18 @@ def _try_plot(results: Dict[str, Dict[str, float]], out_dir: Path) -> None:
     _annotate(axs[3], bars3, fmt="{:.1f}")
 
     for ax in axs:
-        ax.tick_params(axis="x", rotation=25)
+        ax.yaxis.grid(True, linestyle="--", alpha=0.3)
+        ax.set_axisbelow(True)
+        ax.tick_params(axis="x", rotation=0)
 
     fig.tight_layout()
     out_path = out_dir / "compare_models_bars.png"
     fig.savefig(out_path, dpi=150)
     print(f"[Compare] Saved plot: {out_path}")
+    pdf_path = out_dir / "compare_models_bars.pdf"
+    fig.savefig(pdf_path)
+    print(f"[Compare] Saved plot PDF: {pdf_path}")
+    plt.close(fig)
 
 
 def main() -> None:
