@@ -30,7 +30,7 @@ def pdf_escape(text: str) -> str:
 
 
 def pdf_text(x: float, y: float, size: int, text: str, font: str = "/F1") -> str:
-    return f"BT {font} {size} Tf 1 0 0 1 {x:.2f} {y:.2f} Tm ({pdf_escape(text)}) Tj ET"
+    return f"0 0 0 rg BT {font} {size} Tf 1 0 0 1 {x:.2f} {y:.2f} Tm ({pdf_escape(text)}) Tj ET"
 
 
 def pdf_text_center(x: float, y: float, size: int, text: str, font: str = "/F1") -> str:
@@ -51,7 +51,7 @@ def pdf_rotated_text(x: float, y: float, size: int, angle_deg: float, text: str,
 
 def pdf_line(x1: float, y1: float, x2: float, y2: float, width: float = 1.0, dash: str = "") -> str:
     dash_cmd = f"{dash} " if dash else ""
-    return f"{width:.2f} w {dash_cmd}{x1:.2f} {y1:.2f} m {x2:.2f} {y2:.2f} l S"
+    return f"0 0 0 RG {width:.2f} w {dash_cmd}{x1:.2f} {y1:.2f} m {x2:.2f} {y2:.2f} l S"
 
 
 def pdf_rect(x: float, y: float, w: float, h: float, fill_rgb: Tuple[float, float, float]) -> str:
@@ -273,7 +273,7 @@ def main() -> None:
   .tick {{ font-family: 'CMU Serif', 'Computer Modern Serif', 'Latin Modern Roman', 'Times New Roman', serif; font-size: 14px; }}
   .value {{ font-family: 'CMU Serif', 'Computer Modern Serif', 'Latin Modern Roman', 'Times New Roman', serif; font-size: 14px; }}
   .axis {{ stroke: #000000; stroke-width: 1.2; }}
-  .grid {{ stroke: #000000; stroke-width: 0.8; opacity: 0.22; }}
+  .grid {{ stroke: #000000; stroke-width: 0.8; opacity: 1; }}
 </style>
 <rect class="bg" x="0" y="0" width="{width}" height="{height}"/>
 {''.join(panels)}
