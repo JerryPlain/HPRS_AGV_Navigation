@@ -27,6 +27,8 @@ VTPRL/
 ├── docs/
 │   ├── Methodology_CN.md             # 方法论（中文）
 │   ├── Methodology_EN.md             # 方法论（英文）
+│   ├── ReGoRL_Paper_Outline_CN.md    # ReGoRL 论文扩展草案
+│   ├── ReGoRL_Project_Structure_EN.md # ReGoRL 英文结构说明与 Mermaid 图
 │   ├── Configuration-Parameters.md   # 参数说明
 │   └── Repo_Guide_CN.md              # 本文档
 ├── agent/                            # 训练与评估主代码
@@ -151,8 +153,9 @@ VTPRL/
 
 1. 先读：`README.md`
 2. 再读：`docs/Methodology_CN.md`
-3. 然后读：`agent/config/*.yaml`（先从 `offline_td3_bc.yaml` 和 `online_td3_llm.yaml` 开始）
-4. 最后按代码顺序看：
+3. 如果你在推进论文方向，再读：`docs/ReGoRL_Paper_Outline_CN.md`
+4. 然后读：`agent/config/*.yaml`（先从 `offline_td3_bc.yaml` 和 `online_td3_llm.yaml` 开始）
+5. 最后按代码顺序看：
    - `agent/expert/run_expert.py`
    - `agent/td3/td3bc/train_td3bc.py`
    - `agent/td3/online_td3/train_online_td3.py`
