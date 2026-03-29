@@ -28,6 +28,7 @@ VTPRL/
 │   ├── Methodology_CN.md             # 方法论（中文）
 │   ├── Methodology_EN.md             # 方法论（英文）
 │   ├── ReGoRL_Paper_Outline_CN.md    # ReGoRL 论文扩展草案
+│   ├── ReGoRL_Paper_Outline_EN.md    # ReGoRL 英文论文大纲
 │   ├── ReGoRL_Project_Structure_EN.md # ReGoRL 英文结构说明与 Mermaid 图
 │   ├── Configuration-Parameters.md   # 参数说明
 │   └── Repo_Guide_CN.md              # 本文档
