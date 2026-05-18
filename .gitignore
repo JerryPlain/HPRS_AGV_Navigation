@@ -229,5 +229,6 @@ __marimo__/
 
 # Exclude files over GitHub 100MB limit
 VTPRL/agent/logs/expert_dataset.pkl
-VTPRL/environment/simulator/*/Linux/VTPRL-Simulator_Data/resources.assets.resS
-VTPRL/environment/simulator/*/Windows/VTPRL-Simulator_Data/resources.assets.resS
+
+# Untrack entire simulator directory (binary Unity builds, too large for GitHub)
+VTPRL/environment/simulator/
